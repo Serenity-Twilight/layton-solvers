@@ -3,12 +3,12 @@ A brute-force solver for the post-game puzzle in Professor Layton and the Diabol
 
 ## Puzzle rules
 The player is presented with 8 cards, each numbered uniquely 1-8.
-Using the cards, it is possible to create 2 correct multiplicative equations of the following format:
+Using the cards, it is possible to create 2 correct multiplicative equations of the following format:\
 **<3-digit multiplicand> * <1-digit multiplier> = <4-digit product>**
 
 Each card (and thus each digit) must be used exactly once.
 
-The player is given one of the two equations possible under these conditions:
+The player is given one of the two equations possible under these conditions:\
 **453 * 6 = 2718**
 
 With no further information, the player must find the other equation.
