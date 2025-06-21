@@ -17,11 +17,11 @@ struct board {
 
 	uint8_t width;
 	uint8_t height;
-	bool* visited;
-
-	uint8_t* move_stack;
 	uint16_t move_count;
 	uint16_t move_count_max;
+
+	bool* visited;
+	uint8_t* move_stack;
 }; // end struct board
 
 //=====================================================================
