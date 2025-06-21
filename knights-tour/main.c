@@ -72,13 +72,13 @@ static bool parse_args(uint8_t out[2], int argc, char* argv[]) {
 	uint64_t val;
 	// Parse <cols> argument
 	if (argv[1][0] == '-') {
-		fputs("ERROR: Number of columns must be greater than zero.\n", stdout);
+		fputs("ERROR: Number of columns cannot be less than 3.\n", stdout);
 		goto input_failure;
 	} else if (!stoui(&val, argv[1])) {
 		printf("ERROR: '%s' is not recognized as a non-negative integer.\n", argv[1]);
 		goto input_failure;
-	} else if (val == 0) {
-		fputs("ERROR: Number of columns must be greater than zero.\n", stdout);
+	} else if (val < 3) {
+		fputs("ERROR: Number of columns cannot be less than 3.\n", stdout);
 		goto input_failure;
 	} else if (val > 255) {
 		fputs("ERROR: Number of columns cannot be greater than 255.\n", stdout);
@@ -88,13 +88,13 @@ static bool parse_args(uint8_t out[2], int argc, char* argv[]) {
 
 	// Parse <rows> argument
 	if (argv[2][0] == '-') {
-		fputs("ERROR: Number of rows must be greater than zero.\n", stdout);
+		fputs("ERROR: Number of rows cannot be less than 3.\n", stdout);
 		goto input_failure;
 	} else if (!stoui(&val, argv[2])) {
 		printf("ERROR: '%s' is not recognized as a non-negative integer.\n", argv[2]);
 		goto input_failure;
-	} else if (val == 0) {
-		fputs("ERROR: Number of rows must be greater than zero.\n", stdout);
+	} else if (val < 3) {
+		fputs("ERROR: Number of rows cannot be less than 3.\n", stdout);
 		goto input_failure;
 	} else if (val > 255) {
 		fputs("ERROR: Number of rows cannot be greater than 255.\n", stdout);
