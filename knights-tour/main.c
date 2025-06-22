@@ -57,8 +57,8 @@ static bool parse_args(uint8_t out[2], int argc, char* argv[]) {
 				"\tRow numbering should be intuitive. Note the first row is labeled as row 1 (not 0).\n"
 				"\n"
 				"Arguments:\n"
-				"\t- <cols>: The width, or number of columns on the board, in spaces. Min: 1; Max: 255.\n"
-				"\t- <rows>: The height, or number of rows on the board, in spaces. Min: 1; Max: 255.\n"
+				"\t- <cols>: The width, or number of columns on the board, in spaces. Min: 3; Max: 255.\n"
+				"\t- <rows>: The height, or number of rows on the board, in spaces. Min: 3; Max: 255.\n"
 				, stdout);
 		return false;
 	} // end if (argc == 1)
