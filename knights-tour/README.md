@@ -32,7 +32,7 @@ Two notes on this:
 
 Running the program without any arguments gives an explanation on how to use the program, much like the one here.
 
-**PERFORMANCE NOTE**
+**PERFORMANCE NOTE**\
 If the board dimensions given have a possible solution, or are trivially impossible (like a 8x1 board or something silly like that), then this program is very fast. Even an 8x8 only takes the program about 1 second to find a solution on my computer when compiled with `-O3` (highest optimization level in GCC, barring experimental features), and about 3 seconds without any compiler optimizations.
 
 However, certain potentially-unsolvable board sizes with lots of possible moves will cause the program to run for a very, very long time. In testing, I killed the program after waiting over an hour for a solution to a 10x10 board. So, if the program appears to stall on you, either your board's too big, or its most likely impossible.
