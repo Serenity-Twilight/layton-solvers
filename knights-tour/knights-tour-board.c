@@ -30,7 +30,7 @@ struct board {
 //=====================================================================
 enum { NUM_DISTINCT_MOVES = 8 };
 
-static const char unsolvable_message[] = "Failed to solve %" PRIu8 "x" PRIu8 " Knight's Tour.\n";
+static const char unsolvable_message[] = "Failed to solve %" PRIu8 "x%" PRIu8 " Knight's Tour.\n";
 static const char logic_error_message[] = "A programming error has been encountered. The solver cannot continue.\n";
 
 // Define deltas (destination - origin) for each move for x and y dimensions:
@@ -70,14 +70,19 @@ char* solve_knights_tour(uint8_t board_width, uint8_t board_height) {
 			} else
 				next_move = 0; // Start at move 0 for knight's new coordinates
 		} else {
+			//fprintf(stderr, "board->move_count = %" PRIu8 "\n", board->move_count);
 			if (board->move_count == 0) {
 				// Failed to solve the board.
 				// Return an error message indicating this, assuming enough memory is available.
 				int msglen = snprintf(NULL, 0, unsolvable_message, board_width, board_height);
+//				fprintf(stderr, "return_message msglen = %d\n", msglen);
 				return_message = malloc(msglen + 1);
-				if (return_message = NULL)
+//				fprintf(stderr, "return_message malloc = %p\n", return_message);
+				if (return_message == NULL)
 					goto cleanup;
 				snprintf(return_message, msglen + 1, unsolvable_message, board_width, board_height);
+//				fprintf(stderr, "return_message = \"%s\"\n", return_message);
+//				fflush(stderr);
 				goto cleanup;
 			} // end failure-to-solve message composition
 
