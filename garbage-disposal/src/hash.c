@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -40,23 +41,38 @@ int hash(int in) {
 	return (((long long int)in) * FIB36) % 1024;
 }
 
-int coord_hash(int in) {
-	uint64_t xy5 = in & XY5_MASK;
-	uint64_t xy4 = in & XY4_MASK;
+// Each block's dimensions can be X=0-5,Y=0-7
+// This gives each block 48 possible coordinate combinations
+// (including out-of-bounds areas for simplicity).
+//
+// Since each block's coordinates are stored as 6-bits,
+// each block's coordinates has 16 (= 64 - 48) unused values.
+//
+// The following hash reduces the range of each block's coordinates
+// in the final value from 64 to 48, improving linear distribution
+// over a hash table.
+size_t coord_hash(size_t in) {
+	// Hash table unlikely to get big enough to use block 5 coordinates.
+	// Commented out analysis of block 5 coordinates for now:
+	//uint64_t xy5 = in & XY5_MASK;
 
-	uint64_t xy3 = in & XY3_MASK;
+	size_t xy4 = in & XY4_MASK;
+	// 64^4 - 48^4 = 11468800 = 2^23 + 2^21 + 2^19 + 2^18 + 2^17 + 2^16
+	xy4 -= (xy4 >> 1) + (xy4 >> 3) + (xy4 >> 5) + (xy4 >> 6) + (xy4 >> 7) + (xy4 >> 8);
+
+	size_t xy3 = in & XY3_MASK;
 	// 64^3 - 48^3 = 151552 = 2^17 + 2^14 + 2^12
 	xy3 -= (xy3 >> 1) + (xy3 >> 4) + (xy3 >> 6);
 
-	uint64_t xy2 = in & XY2_MASK;
+	size_t xy2 = in & XY2_MASK;
 	// 64^2 - 48^2 = 1792 = 2^11 + 2^8
 	xy2 -= (xy2 >> 1) + (xy2 >> 4);
 
-	uint64_t xy1 = in & XY1_MASK;
+	size_t xy1 = in & XY1_MASK;
 	// 64 - 48 = 16, xy1 - (xy1 / 4)
 	xy1 -= xy1 >> 2;
 
-	return (in & XY0_MASK) + xy1 + xy2 + xy3;
+	return (in & XY0_MASK) + xy1 + xy2 + xy3 + xy4;
 } // end coord_hash()
 
 int badhash(int in) {

@@ -40,4 +40,27 @@ Reduce to 48^3 (110592)
 20480 - 2^14 = 4096 = (2^12)
 
 XY3 -= (XY3 >> 1) + (XY3 >> 4) + (XY3 >> 6)
+---------------------------------------------------------------------
+LSB XY4 = 64^4 = 16777216 = 2^24
+Reduce to 48^4 = 5308416
+
+64^4 - 48^4 = 11468800
+- 2^23 (8388608) = 3080192
+- 2^21 (2097152) = 983040
+- 2^19 (524288) = 458752
+- 2^18 (262144) = 196608
+- 2^17 (131072) = 65536
+= 2^16
+---------------------------------------------------------------------
+Due to...
+1. X=0-5,Y=0-7 still contains out-of-bounds coordinates, and
+2. it being very likely that many, many moves are unreachable,
+
+XY5 will be discarded by the hash function.
+Including it will likely have next to no effect on linear distribution
+at the estimate max size the hash table is expected to reach.
+
+Constricting XY5 from 64^5 to 48^5 will also take many additional
+mathematical operations that will slow down every access.
+
 
