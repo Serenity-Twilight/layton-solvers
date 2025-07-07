@@ -1,0 +1,10 @@
+Depth-first search
++ State resulting from the most recent block movement matches the current state.
+  Thus, the collision detection board does not need to be reinitialized between each state.
+
+	Handling parent changes:
+
+Breadth-first search
+- Current puzzle state may be too different from previously analyzed puzzle state to
+  reuse the collision detection board state, requiring it be reinitialized with each state change.
+

@@ -1,0 +1,78 @@
+----------------------------------------
+Blocks:
+A - The 2x2 garbage block
+B - The top-left L block
+C - The top-right L block
+D - The bottom-left L block
+E - The bottom-right L block
+F - The 2x1 block starting at the bottom
+----------------------------------------
+Postions and puzzle states
+
+  A - 15 unique positions
+B,C - 17 unique positions each
+D,E - 16 unique positions each
+  F - 20 unique positions
+
+15 * 17^2 * 16^2 * 20
+= 22,195,200 unique puzzle states
+(NOTE: Not every state may be reachable)
+----------------------------------------
+struct puzzle_state {
+	uint64_t current_state
+	struct puzzle_state* parent
+	uint8_t num_moves
+	uint8_t next_state
+	bool is_ancestor
+}
+sizeof(struct puzzle_state) = 24 (because alignment)
+
+`current_state` contains the current coordinates of all blocks, encoded into 6-bit (x,y) coordinate pairs:
+0..35: Block positions
+	 0..5 : Block A coordinates
+		 0..2 : X coordinate, 0-5
+		 3..5 : Y coordinate, 0-7
+	 6..11: Block B coordinates
+		 6..8 : X coordinate, 0-5
+		 9..11: Y coordinate, 0-7
+	12..17: Block C coordinates
+		12..14: X coordinate, 0-5
+		15..17: Y coordinate, 0-7
+	18..23: Block D coordinates
+		18..20: X coordinate, 0-5
+		21..23: Y coordinate, 0-7
+	24..29: Block E coordinates
+		24..26: X coordinate, 0-5
+		27..29: Y coordinate, 0-7
+	30..35: Block F coordinates
+		30..32: X coordinate, 0-5
+		33..35: Y coordinate, 0-7
+
+`parent` is...a pointer to the previous state.
+`parent` may change value as the program runs, because...
+If a puzzle state can be reached from more than one parent state,
+then `parent` is points to the parent puzzle state with the fewest moves.
+
+`num_moves` is the number of distinct moves it takes to reach this state.
+A "move" is defined by the movement of any 1 block from any position to another, without having to stop to move a different block.
+This program, for simplicity, only moves blocks by 1 space in any cardinal direction per step,
+but `num_moves` will account for the movement of a single block across consecutive steps.
+
+`next_step` indicates the next relative state to try from this puzzle state. Begins at 0.
+This is a state variable for use by depth-first search to remember where it left off after returning to this state from one of its descendents.
+As puzzle state progresses by moving any one of 6 blocks in any one of 4 cardinal directions,
+then there exists a maximum of 24 potential states after any current state.
+(Technically 23 if discounting the parent, because going backwards would be pointless)
+Once this value exceeds 23, all potential states immediately following this one are exhausted and the depth-first search returns to the this state's parent
+
+PROBLEM!
+PROBLEM!!
+PROBLEM!!!
+
+As the value of `parent` can change during evaluation of possible moves, depth-first search can return to a different parent than the
+one it arrived from after it exhausts all descendents of its current state.
+This alternative parent may NOT have the potential to reach the solution that the original parent did.
+
+Would breadth-first search solve this?
+
+

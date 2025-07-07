@@ -1,0 +1,59 @@
+Number of possible distinct coordinate pairs for...
+Trash block: 15
+Top-left + top-right L-blocks: 17 each
+Bottom-left + bottom-right L-blocks: 16 each
+Rectangle: 20
+
+15 * 17^2 * 16^2 * 20
+= 22,195,200 unique puzzle states
+
+Represent puzzle states as 6D array:
+
+Puzzle State struct:
+{
+	ancestor: Puzzle state that leads to this state in exactly 1 move. Should be the state that has the fewest number of ancestors of any potential ancenstor to this state
+	descendents: all states that can be reached with exactly 1 move from this state that can't be reached with by any other state that has fewer ancestors (explained better below)
+
+	num_moves: The number of moves, from the start of the puzzle, to reach this state. Always equal to `ancestor.num_moves + 1`.
+}
+
+Descendents explaination:
+The algorithm should find the shortest number of moves to solve the puzzle.
+1. Upon identification of a unique state (referred to as `this_state` from now on),
+   all states that can be reached with 1 move from `this_state` (each referred to as `other_state` from now on) are iterated over.
+2. Any `other_state` encountered for the first time (has no existing ancestor) is
+   added to `this_state`'s descendents, and `this_state` becomes `other_state`'s ancestor.
+3. Any `other_state` that has been encountered before (already has an ancestor) receives further evaluation:
+	a. If the `other_state.num_moves > this_state.num_moves + 1`, then:
+		* `other_state.ancestor = this_state` and `other_state.num_moves = this_state.num_moves + 1`
+		* `other_state` is removed from its prior ancestor's list of descendents.
+		* `other_state` is added to `this_state`'s list of descendents
+
+------------------------------------------------------------------------------------------------
+
+The position of each block is encoded within the index.
+This massive 22,195,200 element, 6-dimensional array gives each unique state a static position for fast lookup.
+
+Each state's `ancestor` and `descendents` members establishes a tree structure for quickly finding a path through the puzzle, which each state acting as a node.
+
+PROBLEM:
+- If each element was only 1 byte, the array would be 21,675 KiB in size.
+	- That's slightly more than 21 MiB.
+- Each element is larger than 1 byte. Not finalized yet, but at least 12 bytes, accounting for alignment.
+	- That's a minimum of 260,100 KiB, or slightly more than 254 MiB.
+	- This doesn't even include the cost of allocating descendent lists.
+- Is there a smaller solution that isn't too slow?
+
+-----------------------------------------------------------------------------------------------
+
+A pure tree structure, excluding the array entirely, would likely be better.
+
+Pros:
++ It's very likely that most of the possible combinations of moves are unreachable, and could be excluded from the tree.
++ If a move only has 1 usable descendent, it can be removed and its ancestor can connect directly with its descendent, compressing it.
++ Nodes are allocated as-needed, so their decendent lists can be stored within them rather than somewhere else.
+Cons:
+- Much slower lookup time than using indices.
+
+Need to implement a red-black tree for traversing block positions within existing puzzle states.
+

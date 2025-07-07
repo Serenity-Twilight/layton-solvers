@@ -1,0 +1,43 @@
+X = 0-5
+Y = 0-7
+
+Integer XY = 0-47 (Max b101111, 32 + 8 + 4 + 2 + 1)
+
+state = (XY5)(XY4)(XY3)(XY2)(XY1)(XY0)
+(6 combinations of block positions)
+
+Masks:
+XY0: 0x       3F
+XY1: 0x      FC0
+XY2: 0x    3F000
+XY3: 0x   FC0000
+XY4: 0x 3F000000
+XY5: 0xFC0000000
+
+---------------------------------------------------------------------
+LSB of XY1 should equal 48, currently equals 64.
+XY1 -= (XY1 / 4)
+
+XY1 = (state % 0xFC0)
+XY1 -= XY1 >> 2 ; (XY1 with LSB = 64 minus XY1 with LSB = 16)
+
+^ Tested. Results in perfect distribution.
+
+---------------------------------------------------------------------
+LSB of XY2 should equal 2304 (48^2), currently equals 4096 (64^2)
+4096 - 2304 = 4096 - (2048 + 256)
+2048 = 2^11
+256 = 2^8
+
+XY2 -= (XY2 >> 1) + (XY2 >> 4)
+
+---------------------------------------------------------------------
+LSB XY3 = 64^3 (262144) = 2^18
+Reduce to 48^3 (110592)
+
+262144 - 110592 = 151552
+151552 - 2^17 = 20480
+20480 - 2^14 = 4096 = (2^12)
+
+XY3 -= (XY3 >> 1) + (XY3 >> 4) + (XY3 >> 6)
+
