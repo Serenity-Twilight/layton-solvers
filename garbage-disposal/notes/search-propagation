@@ -1,0 +1,89 @@
+Puzzle fundamentals:
+1. There are 6 pieces.
+2. Any piece can be moved at any time, so long as there is space to move it.
+3. Moving a piece counts as a 'move', the goal is the get the square block into position in the fewest number of 'moves'.
+	- An exception: Once a specific piece has moved, it can be moved any number of additional times without counting as more than 1 `move` until a different piece is moved.
+	- In other words, a piece can be moved to any position it can reach without moving any other piece and it will only count as 1 `move`.
+
+== For individual pieces ==
+Since a single piece can be moved to any position it can reach without moving other pieces for no additional `move` cost,
+positions that an individual piece can reach can be discovered via depth-search search.
+Reason: Depth-first search is less memory intensive
+
+== For multiple pieces ==
+Since move count matters when moving multiple pieces, breadth-first search should be used in order find the minimum number of `moves` to complete the puzzle.
+
+
+////// PSEUDOCODE \\\\\\
+
+Order puzzle state by number of moves required to reach it.
+Let `m` = number of moves
+Let `state_list[m]` = An array of lists of all puzzle states encountered. Index is number of moves required to reach a particular list's states
+
+let `m` = 0
+let `state_list[0]` = { puzzle start } // One element
+while `state_list[m]` is NOT empty:
+	m = m + 1
+	for each `state` in `state_list[m-1]`:
+		for each `piece` in `state` that was NOT the previous piece moved:
+			for each `new_state` reachable by moving ONLY `piece`:
+				if `new_state` has never been reached before
+					add `new_state` to end of `state_list[m]`
+					mark `new_state` as reached so it doesn't ever get queued again
+					if `new_state` == winning state
+						end
+
+\\\\\\ END PSEUDOCODE //////
+
+The above algorithm...
+1. Iterates through every reachable puzzle state in order to moves required to reach it, ensuring minimum move count
+2. Ignores previously-encountered states, preventing loops
+3. Terminates on finding a solution
+
+=== Previously visited state array ===
+
+There are
+20 * 17^2 * 16^2 * 15 = 22,195,200 distinct puzzle states
+An array of single bits indicating either each has been visited or not would cost...
+22,195,200 / 8 = 2,774,400 bytes = ~2.646 MiB
+
+That's, relatively-speaking, a very large array, but a small cost to pay for near-instant lookup time.
+
+=== `state` object ===
+
+struct state {
+	// Link to the next `state` in the list of states reachable with exactly `m` moves.
+	// Logically unrelated. May or may not share a parent with this `state`.
+	struct state* list_next;
+
+	// Previous state before this one.
+	// If this `state` is reachable in `m` moves,
+	// `parent` is reachable in `m-1` and can turn into this `state` with exactly 1 move.
+	struct state* parent;
+
+	// Distinct state ID, composed of numerical representations of the positions of all blocks.
+	// - Two different states will always have different IDs
+	// - A `state` ID can be converted to an actionable puzzle state (block movement and collision tests possible),
+	//   and vice versa, without any additional information
+	uint32_t id;
+
+	// The number of children that this is a parent of.
+	// If a child reaches a dead end (has no new states it can reach, and thus 0 active children), it gets deleted to save memory.
+	// Upon deletion, the `active_children` count of its parent gets decremented by 1.
+	// If the parent's `active_children` counter reaches 0, it too gets deleted,
+	// and its parent's `active_children` counter is decremented, and so on...
+	uint16_t active_children;
+
+	// The previous block moved.
+	// Previous the state-searching algorithm from attempting to move the prior block, which would mess with `move` count.
+	// Typically 0-5. For the starting state, will not be any of these values to indicate that no blocks have been moved yet.
+	int8_t prev_block;
+}
+
+=== Finding the solution ===
+
+Once the solution state is reached, the search immediately stops.
+Starting from the solution and working backwards, build human-readable instructions for eaching each state from the previous one.
+Continue until the start of the puzzle is reached.
+Output instructions from start-to-finish.
+
