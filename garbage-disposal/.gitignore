@@ -3,6 +3,7 @@ garbage-disposal
 cxx-test
 hash
 a.out
+test
 
 # Program output
 out
